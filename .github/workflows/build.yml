@@ -34,15 +34,11 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-            ~/.gradle/caches/minecraft
-          key: ${{ runner.os }}-fg23-${{ hashFiles('**/*.gradle', 'gradle.properties') }}
-          restore-keys: ${{ runner.os }}-fg23-
-
-      - name: Setup ForgeGradle workspace
-        run: ./gradlew setupCiWorkspace --no-daemon --stacktrace
+          key: ${{ runner.os }}-fg3-v1-${{ hashFiles('**/*.gradle', 'gradle.properties', 'gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-fg3-v1-
 
       - name: Build
-        run: ./gradlew build --no-daemon --stacktrace
+        run: ./gradlew build --no-daemon --stacktrace --refresh-dependencies
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
