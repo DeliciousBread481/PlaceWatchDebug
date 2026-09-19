@@ -1,0 +1,15 @@
+[
+  {
+    "modid": "placewatchdebug",
+    "name": "PlaceWatchDebug",
+    "description": "Client/Server block-placement desync diagnostic mod (packet + event logging).",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "authorList": [ "deliciousbread481" ],
+    "logoFile": "",
+    "url": "",
+    "credits": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "required": true,
+  "minVersion": "0.7.11",
+  "package": "deliciousbread481.placewatchdebug.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "placewatchdebug.refmap.json",
+  "mixins": [
+    "common.MixinNetworkManager"
+  ],
+  "client": [
+    "client.MixinPlayerControllerMP",
+    "client.MixinNetHandlerPlayClient"
+  ],
+  "server": [
+    "server.MixinNetHandlerPlayServer",
+    "server.MixinPlayerInteractionManager"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

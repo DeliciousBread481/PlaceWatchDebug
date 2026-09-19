@@ -1,0 +1,76 @@
+buildscript {
+    repositories {
+        maven { url = 'https://maven.minecraftforge.net' }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        maven { url = 'https://maven.cleanroommc.com' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3.+'
+        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'org.spongepowered.mixin'
+
+group   = project.mod_group
+version = project.mod_version
+archivesBaseName = project.mod_name
+
+sourceCompatibility = targetCompatibility = '1.8'
+compileJava {
+    sourceCompatibility = targetCompatibility = '1.8'
+    options.encoding = 'UTF-8'
+}
+
+minecraft {
+    version = "${project.mc_version}-${project.forge_version}"
+    runDir  = 'run'
+    mappings = project.mappings
+    // makeObfSourceJar = false
+}
+
+repositories {
+    maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+    maven { url = 'https://maven.cleanroommc.com' }
+}
+
+dependencies {
+    // Mixin is provided at runtime by Cleanroom's built-in Mixin loader.
+    // Here we only need it to compile + run the annotation processor.
+    provided 'org.spongepowered:mixin:0.7.11-SNAPSHOT'
+    annotationProcessor 'org.spongepowered:mixin:0.7.11-SNAPSHOT:processor'
+}
+
+mixin {
+    // Generates the refmap so the mixins remap correctly into the obf/dev env
+    add sourceSets.main, "placewatchdebug.refmap.json"
+    config 'placewatchdebug.mixins.json'
+}
+
+processResources {
+    inputs.property 'version', project.version
+    inputs.property 'mcversion', project.mc_version
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+        expand 'version': project.version, 'mcversion': project.mc_version
+    }
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+jar {
+    manifest {
+        attributes([
+            'FMLCorePluginContainsFMLMod': 'true',
+            'ForceLoadAsMod'             : 'true',
+            'MixinConfigs'               : 'placewatchdebug.mixins.json',
+            // TweakClass is needed on *vanilla* Forge; on Cleanroom the built-in
+            // Mixin bootstrap reads MixinConfigs directly and ignores this harmlessly.
+            'TweakClass'                 : 'org.spongepowered.asm.launch.MixinTweaker',
+            'TweakOrder'                 : '0'
+        ])
+    }
+}

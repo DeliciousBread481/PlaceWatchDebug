@@ -1,0 +1,53 @@
+name: Build PlaceWatchDebug
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+
+      - name: Ensure gradle wrapper jar
+        run: |
+          if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
+            mkdir -p gradle/wrapper
+            curl -Lo gradle/wrapper/gradle-wrapper.jar \
+              https://raw.githubusercontent.com/gradle/gradle/v4.10.3/gradle/wrapper/gradle-wrapper.jar
+          fi
+          chmod +x gradlew || true
+
+      - name: Cache Gradle & ForgeGradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.gradle/caches/minecraft
+          key: ${{ runner.os }}-fg23-${{ hashFiles('**/*.gradle', 'gradle.properties') }}
+          restore-keys: ${{ runner.os }}-fg23-
+
+      - name: Setup ForgeGradle workspace
+        run: ./gradlew setupCiWorkspace --no-daemon --stacktrace
+
+      - name: Build
+        run: ./gradlew build --no-daemon --stacktrace
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PlaceWatchDebug-jar
+          path: build/libs/*.jar
+          if-no-files-found: error
+          retention-days: 14
